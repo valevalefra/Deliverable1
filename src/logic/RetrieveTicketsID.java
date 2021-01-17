@@ -9,13 +9,14 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
 
 public class RetrieveTicketsID {
 
-
+	private static Properties prop = ConfigurationPath.getInstance();
 
 
    private static String readAll(Reader rd) throws IOException {
@@ -54,17 +55,18 @@ public class RetrieveTicketsID {
   
   	   public static void main(String[] args) throws IOException {
 		   
+  		SysCall.gitClone();
   		String filePath="Result.csv"; 
   		FileWriter fileWriter= new FileWriter(filePath);
   		
-		String firstDate = SysCall.firstCommit(SysCall.PROJ_NAME);
-		String lastDate = SysCall.lastCommit(SysCall.PROJ_NAME);
+		String firstDate = SysCall.firstCommit(SysCall.PATH);
+		String lastDate = SysCall.lastCommit(SysCall.PATH);
 		List<String> dates = SysCall.getDatesBetween(firstDate, lastDate);
   		
-		try{
-  		ArrayList<Object> array = new ArrayList<>();
+	  try{
+  	   ArrayList<Object> array = new ArrayList<>();
   		   
-  		   String projName ="FALCON";
+  	   String projName =prop.getProperty("PROJECT").toLowerCase();
 		
 	   Integer j = 0;
 	   Integer i = 0;

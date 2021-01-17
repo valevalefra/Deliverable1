@@ -7,12 +7,22 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 
 public class SysCall {
 	
-	public static final String PROJ_NAME = "C:\\Users\\valen\\Desktop\\falcon";
 	public static final String CMD = "git -C "; 
+	private static Properties prop = ConfigurationPath.getInstance();
+	private static String pathDirFin = "\\";
+	static String project="PROJECT";
+    static final String PATH = "..\\..\\" + prop.getProperty(project).toLowerCase() +pathDirFin;
+	private static String repoUrl = prop.getProperty("REPO_APACHE_PREFIX")+prop.getProperty(project).toLowerCase()+".git";
+	private static final Logger log = Logger.getLogger(SysCall.class.getName());
+	private static final String EXCEPTION_THROWN = "an exception was thrown";
 	
 	  private SysCall() {
 		    throw new IllegalStateException("Utility class");
@@ -26,7 +36,7 @@ public class SysCall {
 	
 	try{
               
-		File path = new File(PROJ_NAME);
+		File path = new File(PATH);
 		logGit = Runtime.getRuntime().exec(CMD+path +" log -1 --pretty=format:\"%cs\" --grep=" + key );
         BufferedReader stdInput = new BufferedReader(new InputStreamReader(logGit.getInputStream()));
         // read the output from the command
@@ -95,6 +105,36 @@ public class SysCall {
             System.exit(-1);
 		}
 		return date;
+	}
+	
+	//Clone the repository in the specified directory
+	public static void gitClone() {
+		
+		String command = "git clone "+repoUrl+" "+PATH;
+		Process p = null;
+		try {
+			//execute command
+			p = Runtime.getRuntime().exec(command);
+			log.info(prop.getProperty("infoGitCLone"));
+			p.waitFor();
+		} catch (IOException e) {
+			log.log(Level.SEVERE,EXCEPTION_THROWN, e);
+		} catch (InterruptedException e) {
+			log.log(Level.SEVERE,EXCEPTION_THROWN, e);
+			Thread.currentThread().interrupt();
+		}
+		exception(p);
+		if (p.exitValue() != 0) {
+			log.info("dirAlredyExist");
+		}else {
+			log.info("CloneComplete");
+		}
+	}
+	
+	private static void exception (Object o) {
+		if (o == null) {
+			throw new IllegalStateException();
+		}
 	}
 	
 
